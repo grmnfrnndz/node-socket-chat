@@ -27,17 +27,20 @@ io.on('connection', (client) => {
         usuarios.agregarPersona(client.id, usuario.nombre, usuario.sala);
 
         client.broadcast.to(usuario.sala).emit('listaPersona', usuarios.getPersonasPorSala(usuario.sala));
+        client.broadcast.to(usuario.sala).emit('crearMensaje', crearMensaje('Administrador', `${usuario.nombre} se unio...`));
 
         callback(usuarios.getPersonasPorSala(usuario.sala));
         }
     });
 
-    client.on('crearMensaje', (payload) => {
+    client.on('crearMensaje', (payload, callback) => {
 
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona.nombre, payload.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback(mensaje);
 
     });
 
